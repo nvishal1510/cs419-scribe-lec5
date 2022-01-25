@@ -142,8 +142,43 @@ We have
 Since $d<<n$, columns of $X^T$ cannot span entire $R^n$ and as y is n-dimensional vector, we can have $y\in \mathbb{R}^n \backslash \mathbb{R}(X)$. Therefore, solution may not exist.\\
 Also, we need to consider the noise.
 
+\section{Linear Regression with Error}
+Let us now consider the equation for linear regression, when including error along with it.\\
 
-\section{Existence of the inverse ${(\sum_{i \in D} (x_i x_i^T))^{-1}}$}
+The equation for linear regression when including noise is given by
+\begin{equation*}
+    Y = \omega^Tx + \epsilon
+\end{equation*}
+
+Now, because of this $\epsilon$ term, the vector $Y$ no longer lies in the rowspace of $x$, as y can be contaminated with noise.
+
+\begin{equation*}
+    Y \notin R(X)
+\end{equation*}
+
+Now, how do we estimate $\omega$ from the given equation for linear regression?\\
+
+\begin{itemize}
+    \item $\epsilon ~ N(0,\sigma^2$\\
+    Here, if $\epsilon ~ N(0,\sigma^2)$, then the optimization function would be the one which maximises the probability that $\epsilon$ is 0\\
+    This would be given by:\\
+    \begin{align*}
+        \max_{\omega} & e^{\frac{-\epsilon^2}{2\sigma^2}}\\
+        \therefore \max_{\omega} & \Pi_{i \in D} & e^{-\frac{-(y_i - \omega^T x)^2}{2\sigma^2}}\\
+        \therefore \min_{\omega} & \sum_{i \in D} (y_i - \omega^T x)^2\\
+    \end{align*}
+    
+    Using this optimization function, let us solve for the optimal value of $\omega$, which would be $\omega_1$ in our case. This can be done by simply differentiating the optimization function and putting it equal to 0.\\
+    
+    \begin{align*}
+        \frac{d}{d\omega} \sum_{i \in D} (y_i - \omega^T x_i)^2 &= 0\\
+        \therefore \frac{d}{d\omega} \sum_{i \in D}(y_i^2 + \omega^Tx_ix_i^T\omega - 2y_i\omega^Tx_i) &= 0\\
+        \therefore \sum_{i \in D}(0 + 2\omega(x_ix_i^T) - 2x_iy_i) &= 0\\
+        \therefore \sum_{i \in D}\omega(x_ix_i^T) &= \sum_{i \in D} x_iy_i &= 0\\
+        \therefore \omega_1 &= \sum_{i \in D} (x_ix_i^T)^{-1} \sum_{i \in D} x_iy_i
+    \end{align*}
+\end{itemize}
+\section{Existence of the inverse $(\sum_{i \in D} (x_i x_i^T))^{-1}$}
  
 We derived : 
 \begin{equation}
@@ -152,37 +187,25 @@ We derived :
 
 Let \textbf{V = $\sum_{i \in D} (x_i x_i^T)$} .\\
 For existence of $V^{-1}$, we need that \textbf{$|V| \neq 0 $ }. Now, let us analyze what is the probability of having \textbf{$|V| = 0 $ }.\\
+Let
 \begin{equation}
     \mathbf{|V| = f( x_1^1, x_1^2, . . . x_n^{d-1}, x_n^d) }
 \end{equation}
-, where {$x_i^j$ = $j^{th}$ element of \textbf{$x_i$}
-\begin{enumerate}
-    \item For two square matrices $A, B$of size $n\times n$ if $AB = BA$ for all B, then show that $A = cI_n$ for some $c \in \mathbb{R}$\\
-    \color{blue}
-    Pick $B$ to be a diagonal matrix with pair-wise distinct elements. Then it can be shown that $A$ is also a diagonal matrix. Now pick $B$ to be a matrix with all ones, i.e. $B = [1]_{ij}$. As $A$ is diagonal, $AB=BA$ implies all diagonal entries of $A$ are equal i.e., $A = cI_n$ for some $c \in \mathbb{R}$
-    \color{black}
-    \item If $x^\top A x = 0\:\: \forall x \in \mathbb{R}^n$ then show that $A$ is skew-symmetric.\\
-    \color{blue}
-    On differentiating the above equation we get
-    $$(A + A^\top)x = 0 \:\: \forall x \in \mathbb{R}^n$$
-    This implies $A = -A^\top$
-    \color{black}
-    \item Show that $\text{rank}(AB) \leq \text{rank}(A)$\\
-    \color{blue} Each column of $AB$ can be viewed as a linear combination of columns of $A$. Hence, if the dimension of column space of $A$ is $r$, the dimension of column space of $AB$ cannot be more than $r$. In other words,
-    $\text{rank}(AB) \leq \text{rank}(A)$
-    \color{black}
-    \item Suppose you have a uniform sampler which samples uniformly from $[0, 1]$. Propose an algorithm which uses this uniform sampler to generate samples from any given distribution.\\
-    \color{blue}
-    Suppose we have a uniform random variable $U \sim \text{Uniform}([0, 1])$. We need to find a function $g$ such that the PDF of the random variable $g(U)$ will be same as that of the given distribution, say $f$. That is $g(U) \sim f$. Which is same as
-    \begin{eqnarray*}
-    \mathbb{P}(g(U) \leq x) &=& \mathbb{P}(U \leq g^{-1}(x))\\
-    \implies \int \limits_{-\infty}^x f(x) \, dx &=& \int \limits_{-\infty}^{g^{-1}(x)} 1 \, du\\
-    \implies F(x) &=& g^{-1}(x)\\
-    \implies g &=& F^{-1}
-    \end{eqnarray*}
-    \color{black}
-\end{enumerate}
+ \begin{flushright}
+ , where $x_i^j$ = $j^{th}$ element of \textbf{$x_i$}  .\\
+  \end{flushright}
+\textbf{Claim:} Probability that $f( x_1^1, x_1^2, . . . x_n^{d-1}, x_n^d) \rightarrow 0 $ is 0.\\
 
+\textbf{Argument:} Say we have generated each $x_i^j$ from $Uni(\cdot)$. It is highly improbable that the multivariable polynomial function $f(\cdot)$ in $n \cdot d$ variables turns out to be 0. Hence, $Pr[ f(\cdot) \rightarrow 0] \rightarrow 0$
+
+Hence, we conclude that the inverse $V^{-1}$ exists at all times.\\
+Another case of interest is that ( $\epsilon$ is a very small finite value)
+\begin{equation}
+    \mathbf{ |V| \in [-\epsilon,\epsilon] }
+\end{equation}
+
+when the $V^{-1}$ will blow up. This has a substantial probability. If this happens, $W^*$ will become very large, which might become a problem as it will cause further calculations to amplify in size\\ 
+Hence, we need a method to tackle this problem in which $W^*$ may become very large.
 \section{Regularization}
 We saw in the previous section, using the notion of probability of a multi-variable function's zeros being obtained from a random distribution to be $0$, that the probability of $det(x_ix_i^T)$ being $0$ was negligible.
 \color{blue}
@@ -261,7 +284,7 @@ Hence, we obtain that the optimization problem for the given $\omega_2$ obtained
 \section{Group Details and Individual Contribution}
 % Fill this part
 \begin{enumerate}
-    \item {\bf Mayank Gupta}:\\
+    \item {\bf Mayank Gupta}: Linear Regression with Error\\
     \\
     \item {\bf Malhar Kulkarni}: {\bf Regularization} to prevent determinant of $x_ix_i^T$ to be too small\\
     \\
