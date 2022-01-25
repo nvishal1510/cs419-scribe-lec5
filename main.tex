@@ -159,25 +159,31 @@ Now, because of this $\epsilon$ term, the vector $Y$ no longer lies in the rowsp
 Now, how do we estimate $\omega$ from the given equation for linear regression?\\
 
 \begin{itemize}
-    \item $\epsilon ~ N(0,\sigma^2$\\
+    \item {\bf Gaussian Distribution}\\
     Here, if $\epsilon ~ N(0,\sigma^2)$, then the optimization function would be the one which maximises the probability that $\epsilon$ is 0\\
     This would be given by:\\
     \begin{align*}
-        \max_{\omega} & e^{\frac{-\epsilon^2}{2\sigma^2}}\\
-        \therefore \max_{\omega} & \Pi_{i \in D} & e^{-\frac{-(y_i - \omega^T x)^2}{2\sigma^2}}\\
-        \therefore \min_{\omega} & \sum_{i \in D} (y_i - \omega^T x)^2\\
+        \max_{\omega}\ \exp{\frac{-\epsilon^2}{2\sigma^2}}\\
+        \therefore \max_{\omega} \prod_{i \in D} & \exp{\frac{-(y_i - \omega^T x)^2}{2\sigma^2}}\\
+        \therefore \min_{\omega} \sum_{i \in D} (y_i - \omega^T x)^2\\
     \end{align*}
-    
+\end{itemize}
     Using this optimization function, let us solve for the optimal value of $\omega$, which would be $\omega_1$ in our case. This can be done by simply differentiating the optimization function and putting it equal to 0.\\
     
     \begin{align*}
         \frac{d}{d\omega} \sum_{i \in D} (y_i - \omega^T x_i)^2 &= 0\\
         \therefore \frac{d}{d\omega} \sum_{i \in D}(y_i^2 + \omega^Tx_ix_i^T\omega - 2y_i\omega^Tx_i) &= 0\\
         \therefore \sum_{i \in D}(0 + 2\omega(x_ix_i^T) - 2x_iy_i) &= 0\\
-        \therefore \sum_{i \in D}\omega(x_ix_i^T) &= \sum_{i \in D} x_iy_i &= 0\\
-        \therefore \omega_1 &= \sum_{i \in D} (x_ix_i^T)^{-1} \sum_{i \in D} x_iy_i
+        \therefore \sum_{i \in D}\omega(x_ix_i^T) &= \sum_{i \in D} x_iy_i\\
+        \color{blue}
+        \therefore \omega_1 &= \color{blue} \sum_{i \in D} (x_ix_i^T)^{-1} \sum_{i \in D} x_iy_i
     \end{align*}
-\end{itemize}
+    \color{black}
+\begin{equation}
+    \mathbf{ W^* = (\sum_{i \in D} (x_i x_i^T))^{-1} \sum_{i \in D} (x_i y_i)} 
+\end{equation}
+
+
 \section{Existence of the inverse $(\sum_{i \in D} (x_i x_i^T))^{-1}$}
  
 We derived : 
@@ -205,7 +211,7 @@ Another case of interest is that ( $\epsilon$ is a very small finite value)
 \end{equation}
 
 when the $V^{-1}$ will blow up. This has a substantial probability. If this happens, $W^*$ will become very large, which might become a problem as it will cause further calculations to amplify in size\\ 
-Hence, we need a method to tackle this problem in which $W^*$ may become very large.
+Hence, we need a method to tackle this problem.
 \section{Regularization}
 We saw in the previous section, using the notion of probability of a multi-variable function's zeros being obtained from a random distribution to be $0$, that the probability of $det(x_ix_i^T)$ being $0$ was negligible.
 \color{blue}
@@ -286,11 +292,11 @@ Hence, we obtain that the optimization problem for the given $\omega_2$ obtained
 \begin{enumerate}
     \item {\bf Mayank Gupta}: Linear Regression with Error\\
     \\
-    \item {\bf Malhar Kulkarni}: {\bf Regularization} to prevent determinant of $x_ix_i^T$ to be too small\\
+    \item {\bf Malhar Kulkarni}: Regularization to prevent determinant of $x_ix_i^T$ to be too small\\
     \\
     \item {\bf N Vishal}: When $h(x)$ is linear (section 5.2)\\
     \\
-    \item {\bf Pradyumna atreya}:\\
+    \item {\bf Pradyumna Atreya}: Section 5.4, Existence of the inverse 
     \\
     \item {\bf Tanisha Khandelwal}: Introduction to Regression (section 5.1)\\
     \\
