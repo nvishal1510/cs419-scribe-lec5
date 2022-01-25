@@ -83,11 +83,11 @@
 %Use this command for a figure; it puts a figure in wherever you want it.
 %usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
 % \newcommand{\fig}[3]{
-% 			\vspace{#2}
-% 			\begin{center}
-% 			Figure \thelecnum.#1:~#3
-% 			\end{center}
-% 	}
+%           \vspace{#2}
+%           \begin{center}
+%           Figure \thelecnum.#1:~#3
+%           \end{center}
+%   }
 % Use these for theorems, lemmas, proofs, etc.
 \newtheorem{theorem}{Theorem}[lecnum]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -102,95 +102,60 @@
 \begin{document}
 %FILL IN THE RIGHT INFO.
 %\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
-\lecture{1}{Review of Probability and Linear Algebra}{Abir De}{Ipsit Mantri}
+\lecture{5}{Regression}{Abir De}{Lecture 5 - Group 2}
 %\lecture{x}{Title}{Abir De}{Group y}
 
-\section{Probability}
-The following topics are important for machine learning:
+\section{Introduction to Regression}
+Let's say we are given a dataset \{(x,y)\} where $y \in \mathbb{R}$.
+Till now we have considered $y \in \{-1,+1\}$ but here we are considering $y \in \mathbb{R}$.
+
+We need to find mapping from x to y that is $x \mapsto y$
+
+\textbf{Applications of Regression}
 \begin{enumerate}
-    \item Conditional Independence or probabilities, Bayesian relationship
-    \item Introducing Random Variables: Bernoulli, Normal, Poisson
-    \item Expectation, Variance, Covariance
-    \item Central Limit Theorem, Law of large numbers
+    \item House price prediction 
+    \item Time series prediction (predicting stocks, loans etc.)
+    \item Sentiment detection
 \end{enumerate}
 
-\subsection{Why Probability is important for Machine Learning?}
-Suppose you have a set of \textbf{Data}. This can be
-\begin{itemize}
-    \item A set of images $\xrightarrow{m_\theta}$ identify the objects
-    \item A set of paragraphs $\xrightarrow{m_\theta}$ identify the topics 
-\end{itemize}
-where $m_\theta$ denotes a model with parameters $\theta$. The objective is to devise a model which learns to do a task. The following question can be posed:
-\begin{flushleft}
-Q. \textbf{What is the underlying thesis/concept behind the hope that it will be possible to train the model $m_\theta$ to get an accurate output?}\\
+If we are given a set a data points $(x_1,y_1) , (x_2,y_2) , (x_3,y_3), \ldots$  we need to find y given x for an unseen sample. So here y is not known and x is not present during training.
 
-Ans. \color{blue}
-\textbf{The law of large numbers}
-\end{flushleft}
+ Our goal is to come up with some function h(x) so that $h(x) \approx y$.
+ 
 
-\subsection{The Law of Large Numbers and Central Limit Theorem}
-Suppose that we have $N$ samples $X_i \sim f(\cdot), \:\:\: i = 1, \hdots, N$ drawn from an unknown distribution. Most of the times, the goal of machine learning is to estimate the distribution $f$ or its properties. For example, in the task of generating images (GAN, VAE etc), the objective of the machine learning model is to identify the underlying distribution of the data samples. Being able to learn the underlying distribution is important even for tasks like housing price prediction, image classification etc because if a test sample is sampled from a different distribution is given to the model, the model will likely fail and give incorrect results. 
-\begin{flushleft}
-Q. \textbf{What is the least that can be found about $f$ using $X_1, \hdots, X_N$?}\\
+\section{When h(x) is linear}
+If the function $h(x)$ is linear, then 
+    \[h(x) = w^T x\]
 
-Ans. \color{blue} Central Limit Theorem states that as long as $N$ is large, the $$\mathbb{E}_{X \sim f(\cdot)}[X] = \frac{\sum X_i}{N}$$
-The Law of Large Numbers further states that
-$$\mathbb{E}_{X \sim f(\cdot)}[X] \xrightarrow{}\frac{\sum X_i}{N}$$
-as $N \xrightarrow{} \infty$. Moreover, the random variable $Z_N = \frac{\sum X_i}{N}$ follows the normal distribution $\mathcal{N}(\mathbb{E}[X], \sigma^2)$
-with $\sigma^2 \propto \frac{1}{N}$ with
-$$\lim \limits_{N \xrightarrow{}\infty}\mathbb{E}[Z_N] = \mathbb{E}[X]$$
-\end{flushleft}
-\begin{flushleft}
-Q. \textbf{What else do we need to completely characterize $f$?}\\
-
-Ans. \color{blue} \textbf{We need the higher order moments!} Using these the moment generating function can be obtained.
-\end{flushleft}
-
-\definition{The moment generating function (MGF) $F(s)$ for a random variable $X$ is defined as the Laplace Transform of the probability density function (PDF) $f(x)$. The inverse Laplace Transform of MGF will give the PDF.
-$$F(s) = \int \limits_{-\infty}^\infty e^{-sx}\, f(x)\, dx$$
-$$f(x) = \int \limits_{-\infty}^\infty e^{sx}\, F(s)\, ds$$}
-
-\proposition{Using only the moments, the MGF can be determined.}
-\begin{proof}
+For each data point $(x_i, y_i)$, we get $y_i \approx w^T x$, i.e, 
 \begin{eqnarray*}
-F(s) &=& \int \limits_{-\infty}^\infty e^{-sx}\, f(x)\, dx\\
-&=& \int \limits_{-\infty}^\infty \sum \limits_{k = 0}^{\infty} \frac{(-s)^k\, x^k}{k!}\, f(x)\, dx\\
-&=& \sum \limits_{k = 0}^{\infty} \frac{(-s)^k}{k!}\, \mathbb{E}[X^k]
+    [y_1, y_2, \hdots, y_n] &=& w^T [x_1, x_2, \hdots, x_n]\\
+    Y_{1\times n} &=& w^T_{1\times d} X_{d\times n}
 \end{eqnarray*}
-\begin{flushleft}
-Note: The discussion about the region of convergence of the Laplace transform is out of the scope of this course.
-\end{flushleft}
-\end{proof}
 
-\proposition{
-Using just the $N$ samples $X_i \sim f(\cdot), \:\:\: i = 1, \hdots, N$, the PDF $f$ can be estimated using the Law of Large Numbers.
-}
-\begin{proof}
-This can be proved as follows:
-\begin{enumerate}
-    \item All moments $\mathbb{E}[X^k]$ can be estimated by invoking the Law of Large Numbers
-    \item The MGF can be found by invoking the Claim 1.2 above.
-    \item $f$ can be estimated by taking the inverse Laplace Transform of the MGF
-\end{enumerate}
-\end{proof}
+To get w, we need to solve the above equation. So, for solution to exist, 
+\[Y\in \mathbb{R}(X)\]
 
-\subsection{Practice Problems}
-\normalfont
-\begin{enumerate}
-    \item  A fair coin is tossed 5 times. Find  $\mathbb{P}(\#H > \# T)$\\
-    \color{blue}It is easy to see that as 5 is odd, there is not possibility of $\#H = \#T$. Hence $\mathbb{P}(\#H > \# T) = 1/2$
-    \color{black}
-    \item $X \sim f(\cdot), Y \sim g(\cdot)$. Then $Z = X+Y \sim \:?$\\
-    \color{blue} \begin{eqnarray*}
-    \mathbb{P}(Z \leq z) &=& \mathbb{P}(X+Y \leq z)\\
-                        &=& \int \limits_{-\infty}^\infty \int \limits_{-\infty}^{z-x}f(x) \, g(y) \, dx\,dy\\
-                        &=& \int \limits_{-\infty}^\infty f(x)\, G(z-x) \, dx
-    \end{eqnarray*}
-    On differentiating, we get
-    $$f_Z(z) = \int \limits_{-\infty}^\infty f(x) g(z-x)\,dx = (f * g)(z)$$
-\end{enumerate}
-\section{Linear Algebra}
-Solve the following problems:
+We have 
+    \[rank(X) = rank(X^T) \leq d\]
+
+Since $d<<n$, columns of $X^T$ cannot span entire $R^n$ and as y is n-dimensional vector, we can have $y\in \mathbb{R}^n \backslash \mathbb{R}(X)$. Therefore, solution may not exist.\\
+Also, we need to consider the noise.
+
+
+\section{Existence of the inverse ${(\sum_{i \in D} (x_i x_i^T))^{-1}}$}
+ 
+We derived : 
+\begin{equation}
+    \mathbf{ W^* = (\sum_{i \in D} (x_i x_i^T))^{-1} \sum_{i \in D} (x_i y_i)} 
+\end{equation}
+
+Let \textbf{V = $\sum_{i \in D} (x_i x_i^T)$} .\\
+For existence of $V^{-1}$, we need that \textbf{$|V| \neq 0 $ }. Now, let us analyze what is the probability of having \textbf{$|V| = 0 $ }.\\
+\begin{equation}
+    \mathbf{|V| = f( x_1^1, x_1^2, . . . x_n^{d-1}, x_n^d) }
+\end{equation}
+, where {$x_i^j$ = $j^{th}$ element of \textbf{$x_i$}
 \begin{enumerate}
     \item For two square matrices $A, B$of size $n\times n$ if $AB = BA$ for all B, then show that $A = cI_n$ for some $c \in \mathbb{R}$\\
     \color{blue}
@@ -217,6 +182,99 @@ Solve the following problems:
     \end{eqnarray*}
     \color{black}
 \end{enumerate}
+
+\section{Regularization}
+We saw in the previous section, using the notion of probability of a multi-variable function's zeros being obtained from a random distribution to be $0$, that the probability of $det(x_ix_i^T)$ being $0$ was negligible.
+\color{blue}
+\begin{align*}
+    |\sum_{i \in D} x_ix_i^T| &= f(x_{1i},x_{2i},x_{3i}...,x_{dd})\\
+    Pr(f(x_{1i},x_{2i},x_{3i}...,x_{dd})) &\rightarrow 0\\
+    \therefore Pr(|\sum_{i \in D} x_ix_i^T|) &\rightarrow 0\\
+    \therefore (\sum_{i \in D}x_ix_i^T)^{-1}\ &\ exists\\
+\end{align*}
+\color{black}
+However, we may see that the above function may have a very small value with finite, non-zero probability. In fact, if we have all $x_{ij} ~ N(0,1)$, the probability that: 
+\color{blue}
+\begin{equation*}
+|\sum_{i \in D} x_ix_i^T| \in [-\epsilon,\epsilon]\end{equation*}
+\color{black} is significant.\\
+
+The issue with this is that according to the previously derived equation for $\omega*$, if the aforementioned determinant is very small, then the inverse of $\sum_{i \in D} x_ix_i^T$ would be very large. This causes the issue that even for a small point $(x_i, y_i)$, the value of $\omega$ would be very large, thus making the equation numerically unstable.\\
+
+Hence, we employ the method of {\bf Regularization}; whereby we obtain the following equation for the ideal parameter $\omega$, by adding an extra hyperparameter $\lambda$ to our optimization equation, to obtain\\
+\begin{equation*}
+    \omega_2 = (\lambda I + \sum_{i \in D} x_ix_i^T)^{-1} . \sum_{i \in D} x_iy_i
+\end{equation*}
+
+Clearly, if the value of $\lambda$ is large enough, then the value of $\omega$ will be numerically stable.\\
+
+However, how large or small should the value of $\lambda$ be?\\
+For this, let us take an example scenario, where we have only one sample, that is, $|D| = 1$.
+\begin{align*}
+\color{blue}
+    L(w) &= \sum_{i \in D} (y_i - \omega_2^T x_i)^2\\
+    \therefore L(w) &= (y_1 - \omega_2^T x_1)^2\\
+    \\ 
+    \color{black}
+    \lambda \rightarrow \infty\\ 
+    \color{blue}
+    \therefore \omega_2 \rightarrow 0\\
+    \therefore L(w) \rightarrow y_1^2\\
+    \\ 
+    \color{black}
+    \lambda \rightarrow 0\\ 
+    \color{blue}
+    \therefore \omega_2 \rightarrow (x_1x_1^T)^{-1}\\
+    \therefore L(w) \rightarrow 0\\
+\end{align*}
+\color{black}
+However, do note that for a dataset of just a single sample, $x_1x_1^T$ would clearly not be invertible, because the rank of $x_1x_1^T$ is 1\\
+Hence, we need to take care of how we set the regularization constant, because if it is higher, then the loss function would not return a value of $0$, but if it is too small, then the previous problem of the matrix being non-invertible may creep up.\\
+
+Now, let us try to find the optimization function for which we obtain $\omega_2$ as the solution.\\
+
+We already know that the initial optimization problem was given by
+\begin{equation*}
+    \min_{\omega} \sum_{i \in D} (y_i - \omega^T x_i)^2 
+\end{equation*}
+
+The solution for the above problem was given by
+\begin{equation*}
+    \omega_1 = (\sum_{i \in D} x_ix_i^T)^{-1} \sum_{i \in D} x_iy_i
+\end{equation*}
+
+Now, for the equation obtained after regularization
+\begin{align*}
+    \omega_2 &= (\lambda I + \sum_{i \in D} x_ix_i^T)^{-1} \sum_{i \in D} x_iy_i \\
+    \therefore 2\lambda I \omega_2 + 2\sum_{i \in D} x_ix_i^T \omega &= 2\sum_{i \in D} x_iy_i\\
+    \therefore 2\lambda I \omega_2 + 2\sum_{i \in D} x_ix_i^T \omega - 2\sum_{i \in D} x_iy_i &= 0\\
+    \therefore \frac{d}{d\omega} (\omega^T (\lambda I) \omega + \sum_{i \in D} (y_i^2 + \omega^T x_ix_i^T \omega - 2\omega^Tx_iy_i)) &= 0\\
+    \therefore \frac{d}{d\omega} (\sum_{i \in D} (y_i^2 + \omega^T x_ix_i^T \omega - 2\omega^Tx_iy_i) + \lambda ||\omega||^2) &= 0\\
+    \therefore \frac{d}{d\omega} (\sum_{i \in D} (y_i - \omega^T x_i)^2 + \lambda ||\omega||^2) &= 0
+\end{align*}
+Hence, we obtain that the optimization problem for the given $\omega_2$ obtained after regularization is given by:\\
+\color{blue}
+\begin{equation*}
+    \min_{\omega} \sum_{i \in D} (y_i - \omega^Tx_i)^2 + \lambda ||\omega||^2
+\end{equation*}
+\color{black}
 \section{Group Details and Individual Contribution}
 % Fill this part
+\begin{enumerate}
+    \item {\bf Mayank Gupta}:\\
+    \\
+    \item {\bf Malhar Kulkarni}: {\bf Regularization} to prevent determinant of $x_ix_i^T$ to be too small\\
+    \\
+    \item {\bf N Vishal}: When $h(x)$ is linear (section 5.2)\\
+    \\
+    \item {\bf Pradyumna atreya}:\\
+    \\
+    \item {\bf Tanisha Khandelwal}: Introduction to Regression (section 5.1)\\
+    \\
+\end{enumerate}
 \end{document}
+
+
+
+
+
